@@ -7,20 +7,22 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-
+//chat 
 
   async function createChat(Title, From) {
     try {
         const { data, error } = await supabase.from("Chat").insert({
             Admin: From,
-            Titre: Title
-        }).single();
+            Titre: Title,
+            State:"Down"
+        }).select();
 
         if (error) {
             throw new Error(error.message);
         }
+       console.log(data)
+        return data[0].id; 
 
-        return data.id; 
     } catch (error) {
         console.error('Error creating chat:', error.message);
         throw new Error('Failed to create chat');
@@ -57,67 +59,6 @@ async function Sentinvitchat(req, res) {
 
 
 
-async function Sentinvitchat2(req, res) {
-  const { Title, From, to } = req.body;
-
-  try {
-      
-      const { data: inviteData, error: inviteError } = await supabase.from("Invitation").insert({
-          Admin: From,
-          idchat: null, 
-          User: to
-      });
-
-      if (inviteError) {
-          console.error('Error sending invitation:', inviteError.message);
-          return res.status(500).json({ message: 'Internal server error' });
-      }
-
-      if (!inviteData || inviteData.length === 0) {
-          console.error('Error: No invitation data returned');
-          return res.status(500).json({ message: 'Internal server error' });
-      }
-
-      const invitationId = inviteData[0].id; 
-
-
-      const { data: chatData, error: chatError } = await supabase.from("Chat").insert({
-          Titre: Title,
-          State: "Down",
-          Admin: From
-      }).single();
-
-      if (chatError) {
-          console.error('Error creating chat:', chatError.message);
-      
-          await supabase.from("Invitation").delete().eq('id', invitationId);
-          return res.status(500).json({ message: 'Internal server error' });
-      }
-
-      if (!chatData || chatData.length === 0) {
-          console.error('Error: No chat data returned');
-          return res.status(500).json({ message: 'Internal server error' });
-      }
-
-      const chatId = chatData.id;
-
-
-      const { error: updateError } = await supabase.from("Invitation").update({ idchat: chatId }).eq('id', invitationId);
-
-      if (updateError) {
-          console.error('Error updating invitation:', updateError.message);
-         
-          await supabase.from("Chat").delete().eq('id', chatId);
-          return res.status(500).json({ message: 'Internal server error' });
-      }
-
-     
-      return res.status(200).json({ message: 'Invitation sent successfully', chatId });
-  } catch (error) {
-      console.error('Error:', error.message);
-      return res.status(500).json({ message: 'Internal server error' });
-  }
-}
 async function RejectInvit(req, res) {
   const { id } = req.body;
   try {
@@ -165,19 +106,7 @@ async function getConversation(req, res) {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//groupe 
 
 async function createGroup(Title, Admin) {
   try {
@@ -185,7 +114,7 @@ async function createGroup(Title, Admin) {
       .from('Groupe')
       .insert({ Titre:Title
         , From:Admin
-       });
+       }).select();
 
     if (error) {
       throw error;
@@ -200,7 +129,7 @@ async function createGroup(Title, Admin) {
 
 
 async function sendGroupInvitation(req, res) {
-  const { Title, Admin, members } = req.body;
+  const { Title, Admin, members  } = req.body;
 
   try {
     let groupId = req.body.idGroup; 
@@ -215,7 +144,7 @@ async function sendGroupInvitation(req, res) {
     }
 
     
-    await supabase.from('Invitation').insert({ groupId, Admin });
+    await supabase.from('Invitation').insert({ idGroupe: groupId, Admin :Admin , User:members});
 
     return res.status(200).json({ message: 'Group invitation sent successfully', groupId });
   } catch (error) {
@@ -228,9 +157,19 @@ async function sendGroupInvitation(req, res) {
 
 
 
+async function AcceptInvitGroupe(req, res) {
+ // jsp quoi faire ? 
+}
 
 
 
 
+module.exports = { getConversation ,
+  sendGroupInvitation, 
+  RejectInvit ,
+   AcceptInvit , 
+   Sentinvitchat,
+   AcceptInvitGroupe
 
-module.exports = { getConversation ,sendGroupInvitation, RejectInvit , AcceptInvit , Sentinvitchat};
+
+};

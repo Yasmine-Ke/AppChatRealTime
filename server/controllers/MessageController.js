@@ -71,6 +71,7 @@ async function Addmessage(req, res) {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
+      // Diffuser le message à tous les clients connectés
     io.emit('message', { Contenu, date, heure });
     // Retourner uniquement les données de session dans la réponse JSON
     return res.status(201).json({ message: 'Message added successfully', data });
