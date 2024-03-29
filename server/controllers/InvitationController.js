@@ -7,14 +7,16 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-//chat 
+//chat jai rajouter lattribut type envoyer a partir du front ! chat or groupe 
 
-  async function createChat(Title, From) {
+  async function createChat(Title, From , type) {
     try {
         const { data, error } = await supabase.from("Chat").insert({
             Admin: From,
             Titre: Title,
-            State:"Down"
+            State:"Down",
+            type:type
+
         }).select();
 
         if (error) {
@@ -29,19 +31,19 @@ const supabase = createClient(supabaseUrl, supabaseKey);
     }
 }
 
-
+//----------------------- envoyer invit des deux cas chat and group , en vas garder cella la 
 async function Sentinvitchat(req, res) {
-    const { Title, From, to } = req.body;
+    const { Title, From, to , type } = req.body;
 
     try {
        
-        const chatId = await createChat(Title, From);
+        const chatId = await createChat(Title, From , type);
 
        
         const { error: inviteError } = await supabase.from("Invitation").insert({
-            Admin: From,
+            From: From,
             idchat: chatId,
-            User: to
+            To: to
         });
 
         if (inviteError) {
@@ -58,7 +60,7 @@ async function Sentinvitchat(req, res) {
 }
 
 
-
+//----------------------la fonction qui permet de supprimer le chat ! en cas de rejet dinvitation 
 async function RejectInvit(req, res) {
   const { id } = req.body;
   try {
@@ -75,6 +77,8 @@ async function RejectInvit(req, res) {
     res.status(500).json({ error: 'Error updating invitation' });
   }
 }
+
+//----------------------la fonction qui permet de modifier le chat lors de lacceptation de linvitation 
 async function AcceptInvit(req, res) {
   const { id } = req.body;
   try {
@@ -96,7 +100,7 @@ async function AcceptInvit(req, res) {
 async function getConversation(req, res) {
   try {
     const { data, error } = await supabase
-      .from('User')
+      .from('Chat')
       .select('*');
     if (error) throw error;
     res.json(data);
@@ -127,7 +131,7 @@ async function createGroup(Title, Admin) {
   }
 }
 
-
+//------------------------------ on va pas lutiliser dans c cas 
 async function sendGroupInvitation(req, res) {
   const { Title, Admin, members  } = req.body;
 
@@ -155,14 +159,14 @@ async function sendGroupInvitation(req, res) {
 
 
 
-
+//------------------ rien a faire 
 
 async function AcceptInvitGroupe(req, res) {
  // jsp quoi faire ? 
 }
 
 
-
+//--------------- HADA MAKAN 
 
 module.exports = { getConversation ,
   sendGroupInvitation, 

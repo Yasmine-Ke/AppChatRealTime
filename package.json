@@ -1,0 +1,6 @@
+{
+  "proxy": "http://localhost:3000",
+  "dependencies": {
+    "socket.io": "^4.7.5"
+  }
+}

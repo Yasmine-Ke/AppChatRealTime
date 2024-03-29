@@ -57,22 +57,30 @@ async function UpdateMesssage(req, res) {
   }
 
 async function Addmessage(req, res) {
-  const { Contenu , date , heure } = req.body;
+  const { content , chatId } = req.body;
   
   try {
     const { data, error } = await supabase
     .from('Message')
     .insert({
-      Content : Contenu,
-      date : date,
-      heure:heure
+      Content : content,
+      chat:chatId
     });
 
     if (error) {
       return res.status(400).json({ message: error.message });
     }
       // Diffuser le message à tous les clients connectés
-    io.emit('message', { Contenu, date, heure });
+  //  io.emit('message', { content,  chat });
+
+
+
+
+
+
+
+
+
     // Retourner uniquement les données de session dans la réponse JSON
     return res.status(201).json({ message: 'Message added successfully', data });
   } catch (error) {
