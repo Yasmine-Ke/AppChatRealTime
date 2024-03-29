@@ -33,7 +33,7 @@ socket.emit('message', {//vos attributs });
 ### Création d'Utilisateur (`createUser`)
 - Gestion de la création d'un nouvel utilisateur en utilisant l'API Supabase.
 - Insertion des informations utilisateur dans la base de données après la création du compte.
-- ![Confirme ur email from supabase ](image.png)
+- ![Confirme ur email from supabase ]![(image.png)](photo/image.png)
 - Fonction :
 
 ```javascript
@@ -87,12 +87,19 @@ async function signOut(req, res) {
     }
 }  
 ```
-
 ### Réinitialisation de Mot de Passe (`resetPassword`)
+
 - Implémentation de la réinitialisation du mot de passe en cas d'oubli.
 - Envoi d'un e-mail de réinitialisation et mise à jour du mot de passe dans la base de données.
-- ![Verification Email](image-1.png)
-- Fonction :
+
+![Email de Vérification](photo/image-1.png)
+
+![Image 2](photo/image-2.png)
+![Image 3](photo/image-3.png)
+
+Vous pouvez également personnaliser vos demandes en fonction de vos besoins ![Image 4](photo/image-4.png).
+
+- Fonction : 
 
 ```javascript
 const { error1 } = await supabase.auth.resetPasswordForEmail("kechidyasmine2@gmail.com");
