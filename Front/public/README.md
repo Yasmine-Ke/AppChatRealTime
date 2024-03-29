@@ -158,6 +158,13 @@ Pour installer React dans votre application, vous pouvez utiliser la commande su
 ```bash
 npx create-react-app nom_de_votre_app
 ```
+## Installation du serveur Node.js et Supabase
+
+Tout d'abord, installez Node.js sur votre machine. Ensuite, pour installer Express et Supabase dans votre application, vous pouvez utiliser la commande suivante :
+
+```bash
+npm install express supabase
+```
 
 ## Relier les applications Node.js et React
 
