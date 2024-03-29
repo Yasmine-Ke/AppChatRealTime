@@ -1,75 +1,209 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
 
+# Rapport sur l'implémentation des Sockets et l'Authentification Utilisateur
 
+## Introduction
+Ce rapport vise à documenter la mise en place des sockets pour la communication en temps réel dans une application, ainsi que les fonctionnalités d'authentification utilisateur utilisant Supabase.
+
+## Sockets
+### Étape 1 : Connexion au Serveur Socket.io
+- Établissement d'une connexion avec le serveur Socket.io à l'aide de la bibliothèque `socket.io-client`.
+- Gestion de la connexion dans un composant React à l'aide de `useEffect`.
+
+### Étape 2 : Réception et Envoi de Messages
+- Réception des messages du serveur à l'aide de l'événement `'message'`.
+
+```javascript
+socket.on('message', async (data) => { 
+    console.log('Message received from client:', data);
+})
+```
+
+- Envoi des messages au serveur à l'aide de la méthode `emit`.    
+
+```javascript
+socket.emit('message', {//vos attributs });
+```
+
+### Étape 3 : Enregistrement des Messages dans la Base de Données
+- Utilisation d'une requête HTTP pour enregistrer les messages dans la base de données.
+- Utilisation d'une condition pour n'enregistrer les messages que pour un chat spécifique.
+
+## Authentification Utilisateur avec Supabase
+### Création d'Utilisateur (`createUser`)
+- Gestion de la création d'un nouvel utilisateur en utilisant l'API Supabase.
+- Insertion des informations utilisateur dans la base de données après la création du compte.
+- ![Confirme ur email from supabase ](image.png)
+- Fonction :
+
+```javascript
+const { user, error } = await supabase.auth.signUp({
+    email: email,
+    password: password
+});
+```
+
+### Connexion Utilisateur (`SignInUser`)
+- Gestion de la connexion d'un utilisateur existant en utilisant l'adresse e-mail et le mot de passe.
+- Retour des informations de session et de l'utilisateur connecté.
+- Fonction :
+
+```javascript
+async function SignInUser(req, res) {
+    const { email, password } = req.body;
+    
+    try {
+        const { user, session, error } = await supabase.auth.signInWithPassword({
+            email:email,
+            password: password
+        });
+     
+        if (error) {
+            return res.status(400).json({ message: error.message });
+        }
+        const { data } = await supabase.auth.getSession();
+    }
+}
+```
+
+### Déconnexion Utilisateur (`signOut`)
+- Gestion de la déconnexion de l'utilisateur actuellement connecté.
+- Utilisation de la méthode `signOut` de Supabase pour terminer la session.
+- Fonction :
+
+```javascript
+async function signOut(req, res) {
+    try {
+        const { error } = await supabase.auth.signOut();
+    
+        if (error) {
+            return res.status(400).json({ message: error.message });
+        }
+       
+        return res.status(200).json({ message: 'Successfully signed out' });
+    } catch (error) {
+        console.error('Error signing out user:', error.message);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}  
+```
+
+### Réinitialisation de Mot de Passe (`resetPassword`)
+- Implémentation de la réinitialisation du mot de passe en cas d'oubli.
+- Envoi d'un e-mail de réinitialisation et mise à jour du mot de passe dans la base de données.
+- ![Verification Email](image-1.png)
+- Fonction :
+
+```javascript
+const { error1 } = await supabase.auth.resetPasswordForEmail("kechidyasmine2@gmail.com");
+```
+
+### Suppression de Compte Utilisateur (`DeleteUser`)
+- Gestion de la suppression d'un compte utilisateur à partir de la base de données.
+- Fonction :
+
+```javascript
+async function DeleteUser(req, res) {
+    const { idu } = req.body;
+    try {
+        const { data, error } = await supabase
+            .from('User')
+            .delete()
+            .eq("id", idu);
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ error: 'Error deleting user' });
+    }
+}
+```
+
+### Récupération des Utilisateurs (`getUsers`)
+- Récupération de la liste des utilisateurs enregistrés dans la base de données.
+- Fonction :
+
+```javascript
+async function getUsers(req, res) {
+    try {
+        const { data, error } = await supabase
+            .from('User')
+            .select('*');
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Error fetching users' });
+    }
+}
+```## Installation des dépendances Node.js
+
+Pour installer les packages nécessaires dans votre application Node.js, exécutez la commande suivante :
+
+```bash
+npm install express supabase
+```
+
+## Installation de React
+
+Pour installer React dans votre application, vous pouvez utiliser la commande suivante :
+
+```bash
+npx create-react-app nom_de_votre_app
+```
+
+## Relier les applications Node.js et React
+
+Pour connecter votre application React à votre serveur Node.js, vous pouvez spécifier un proxy dans le fichier `package.json` de votre application React. Ajoutez la ligne suivante :
+
+```json
+"proxy": "http://localhost:5000"
+```
+
+Cela permettra à votre application React de faire des requêtes au serveur Node.js sans avoir à spécifier l'adresse complète.
+
+## Lancement du serveur
+
+Pour exécuter votre serveur Node.js, utilisez l'une des commandes suivantes, selon votre configuration :
+
+```bash
+npm start
+```
+ou
+```bash
+npm run dev
+```
+
+## Lancement de l'application client
+
+Pour lancer votre application client React, exécutez la commande suivante :
+
+```bash
+npm start
+```
+
+Cela démarrera l'application React et l'ouvrira dans votre navigateur par défaut.
+
+
+
+## Installation du socket côté client
+
+Pour installer la bibliothèque socket.io dans votre application côté client, exécutez la commande suivante :
+
+```bash
+npm install socket.io-client
+```
+
+## Installation du socket côté serveur
+
+Pour installer la bibliothèque socket.io dans votre application côté serveur, utilisez la commande suivante :
+
+```bash
+npm install socket.io
+```
+
+
+## Conclusion
+Ce rapport a décrit  l'implémentation des sockets pour la communication en temps réel dans une application, ainsi que les fonctionnalités d'authentification utilisateur utilisant Supabase. Ces fonctionnalités sont essentielles pour assurer la sécurité et la convivialité de l'application.
 
 

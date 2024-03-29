@@ -236,8 +236,6 @@ async function getUsers(req, res) {
 
 ## Conclusion
 Ce rapport a décrit  l'implémentation des sockets pour la communication en temps réel dans une application, ainsi que les fonctionnalités d'authentification utilisateur utilisant Supabase. Ces fonctionnalités sont essentielles pour assurer la sécurité et la convivialité de l'application.
-```
-Ce rapport a été mis à jour en développant les idées existantes et en fournissant des explications détaillées pour chaque fonctionnalité, tout en maintenant les images et les fonctions dans le contexte approprié.
 
 
 
