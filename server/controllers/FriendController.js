@@ -14,8 +14,8 @@ async function DeleteFriend(req, res) {
   
   try {
     const { user, error } = await supabase.auth.signUp({
-      email: "yasminekechid@gmail.com",
-      password: "Yasminekechid2002"
+      email: "",
+      password: ""
     });
 
     if (error) {
@@ -34,8 +34,8 @@ async function UpdateFriend(req, res) {
     
     try {
       const { user, error } = await supabase.auth.signUp({
-        email: "yasminekechid@gmail.com",
-        password: "Yasminekechid2002"
+        email: "",
+        password: ""
       });
   
       if (error) {
@@ -55,8 +55,8 @@ async function AddFriend(req, res) {
   
   try {
     const { user, session, error } = await supabase.auth.signInWithPassword({
-      email: "kechidyasmine2@gmail.com",
-      password: "Yasminekechid2002"
+      email: "",
+      password: ""
     });
 
     if (error) {
